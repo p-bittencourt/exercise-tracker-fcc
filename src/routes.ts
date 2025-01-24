@@ -1,5 +1,8 @@
 import { Application, Request, Response } from 'express';
 import { v4 } from 'uuid';
+import { User } from './types/users';
+
+const users: User[] = [];
 
 export const createRoutes = (app: Application) => {
   app.get('/', (req: Request, res: Response) => {
@@ -10,10 +13,15 @@ export const createRoutes = (app: Application) => {
     const username = req.body.username;
     const id = v4();
 
-    res.json({
+    const newUser: User = {
       username,
+      count: 0,
       id,
-    });
+      log: [],
+    };
+
+    users.push(newUser);
+    res.json(newUser);
   });
 
   app.get('/api/users/:_id/logs', (req: Request, res: Response) => {
