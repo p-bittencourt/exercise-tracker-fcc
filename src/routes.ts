@@ -31,8 +31,14 @@ export const createRoutes = (app: Application) => {
   app.post('/api/users/:_id/exercises', (req: Request, res: Response) => {
     const _id = req.params._id;
     const { description, duration, date } = req.body;
+    let exerciseDate;
+    if (date) {
+      exerciseDate = new Date(date).toDateString();
+    } else {
+      exerciseDate = new Date().toDateString();
+    }
 
-    const exercise: Exercise = { description, duration, date };
+    const exercise: Exercise = { description, duration, date: exerciseDate };
     addExercise(_id, exercise);
 
     const username = getUserName(_id);
@@ -41,7 +47,7 @@ export const createRoutes = (app: Application) => {
       username,
       description,
       duration,
-      date,
+      exerciseDate,
       _id,
     });
   });
@@ -50,6 +56,11 @@ export const createRoutes = (app: Application) => {
     try {
       const { _id } = req.params;
       const { from, to, limit } = req.query;
+
+      const user = findUser(_id);
+      if (!user) {
+        res.json({ error: 'User not found ' });
+      }
 
       res.json({
         _id,
@@ -75,8 +86,14 @@ const findUser = (id: string): User | undefined => {
   return users.find((user) => user._id === id);
 };
 
-const getUserName = (id: string): string => {
+const getUserName = (id: string): string | undefined => {
   const user = findUser(id);
-  if (user) return user.username;
-  else return 'User not found';
+  return user?.username;
 };
+
+const getUserLogs = (
+  user: User,
+  from?: string,
+  to?: string,
+  limit?: string
+) => {};
