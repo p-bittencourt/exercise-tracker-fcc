@@ -1,6 +1,7 @@
 import { Application, Request, Response } from 'express';
 import { v4 } from 'uuid';
 import { User } from './types/users';
+import { Exercise } from './types/exercise';
 
 const users: User[] = [];
 
@@ -11,17 +12,38 @@ export const createRoutes = (app: Application) => {
 
   app.post('/api/users', (req: Request, res: Response) => {
     const username = req.body.username;
-    const id = v4();
+    const _id = v4();
 
     const newUser: User = {
       username,
       count: 0,
-      id,
+      _id,
       log: [],
     };
 
     users.push(newUser);
-    res.json(newUser);
+    res.json({
+      username,
+      _id,
+    });
+  });
+
+  app.post('/api/users/:_id/exercises', (req: Request, res: Response) => {
+    const _id = req.params._id;
+    const { description, duration, date } = req.body;
+
+    const exercise: Exercise = { description, duration, date };
+    addExercise(_id, exercise);
+
+    const username = getUserName(_id);
+
+    res.json({
+      username,
+      description,
+      duration,
+      date,
+      _id,
+    });
   });
 
   app.get('/api/users/:_id/logs', (req: Request, res: Response) => {
@@ -39,4 +61,22 @@ export const createRoutes = (app: Application) => {
       res.status(500).json({ error: 'Error fetching exercise logs' });
     }
   });
+};
+
+const addExercise = (id: string, exercise: Exercise): void => {
+  const user = findUser(id);
+  if (user) {
+    user.count += 1;
+    user.log.push(exercise);
+  }
+};
+
+const findUser = (id: string): User | undefined => {
+  return users.find((user) => user._id === id);
+};
+
+const getUserName = (id: string): string => {
+  const user = findUser(id);
+  if (user) return user.username;
+  else return 'User not found';
 };
