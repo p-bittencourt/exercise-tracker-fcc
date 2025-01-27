@@ -52,7 +52,11 @@ export const createRoutes = (app: Application) => {
       return;
     }
 
-    const exercise: Exercise = { description, duration, date: exerciseDate };
+    const exercise: Exercise = {
+      description,
+      duration: parseInt(duration),
+      date: exerciseDate,
+    };
     addExercise(_id, exercise);
 
     res.json({
@@ -114,5 +118,24 @@ const getUserLogs = (
   to?: string,
   limit?: string
 ) => {
-  return user.log;
+  let logs = user.log;
+  if (from) {
+    logs = logs.filter((log) => {
+      const logDate = new Date(log.date);
+      const fromDate = new Date(from);
+      if (logDate > fromDate) return log;
+    });
+  }
+  if (to) {
+    logs = logs.filter((log) => {
+      const logDate = new Date(log.date);
+      const toDate = new Date(to);
+      if (logDate < toDate) return log;
+    });
+  }
+  if (limit) {
+    const intLimit = parseInt(limit);
+    logs.length > intLimit ? (logs = logs.slice(0, intLimit)) : logs;
+  }
+  return logs;
 };
