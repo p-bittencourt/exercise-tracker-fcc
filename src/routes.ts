@@ -12,9 +12,10 @@ export const createRoutes = (app: Application) => {
   });
 
   app.get('/api/users', (req: Request, res: Response) => {
-    const output = users.map(
-      (user) => `"_id":${user._id}, "username":${user.username}`
-    );
+    const output = users.map((user) => ({
+      _id: `${user._id}`,
+      username: `${user.username}`,
+    }));
     res.send(output);
   });
 
