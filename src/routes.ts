@@ -2,8 +2,9 @@ import { Application, Request, Response } from 'express';
 import { v4 } from 'uuid';
 import { User } from './types/users';
 import { Exercise } from './types/exercise';
+import { addExercise, findUser, getUserLogs, getUserName } from './helpers';
 
-const users: User[] = [];
+export const users: User[] = [];
 
 export const createRoutes = (app: Application) => {
   app.get('/', (req: Request, res: Response) => {
@@ -93,49 +94,4 @@ export const createRoutes = (app: Application) => {
       res.status(500).json({ error: 'Error fetching exercise logs' });
     }
   });
-};
-
-const addExercise = (id: string, exercise: Exercise): void => {
-  const user = findUser(id);
-  if (user) {
-    user.count += 1;
-    user.log.push(exercise);
-  }
-};
-
-const findUser = (id: string): User | undefined => {
-  return users.find((user) => user._id === id);
-};
-
-const getUserName = (id: string): string | undefined => {
-  const user = findUser(id);
-  return user?.username;
-};
-
-const getUserLogs = (
-  user: User,
-  from?: string,
-  to?: string,
-  limit?: string
-) => {
-  let logs = user.log;
-  if (from) {
-    logs = logs.filter((log) => {
-      const logDate = new Date(log.date);
-      const fromDate = new Date(from);
-      if (logDate > fromDate) return log;
-    });
-  }
-  if (to) {
-    logs = logs.filter((log) => {
-      const logDate = new Date(log.date);
-      const toDate = new Date(to);
-      if (logDate < toDate) return log;
-    });
-  }
-  if (limit) {
-    const intLimit = parseInt(limit);
-    logs.length > intLimit ? (logs = logs.slice(0, intLimit)) : logs;
-  }
-  return logs;
 };
