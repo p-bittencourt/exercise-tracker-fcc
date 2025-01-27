@@ -47,9 +47,8 @@ export const createRoutes = (app: Application) => {
       exerciseDate = new Date().toDateString();
     }
 
-    const username = getUserName(_id);
-
-    if (!username) {
+    const user = findUser(_id);
+    if (!user) {
       res.json({ error: 'User not found' });
       return;
     }
@@ -62,11 +61,11 @@ export const createRoutes = (app: Application) => {
     addExercise(_id, exercise);
 
     res.json({
-      _id,
-      username,
-      exerciseDate,
-      duration,
-      description,
+      _id: user._id,
+      username: user.username,
+      date: exercise.date,
+      duration: exercise.duration,
+      description: exercise.description,
     });
   });
 
