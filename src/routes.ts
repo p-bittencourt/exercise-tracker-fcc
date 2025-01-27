@@ -62,11 +62,11 @@ export const createRoutes = (app: Application) => {
     addExercise(_id, exercise);
 
     res.json({
-      username,
-      description,
-      duration,
-      exerciseDate,
       _id,
+      username,
+      exerciseDate,
+      duration,
+      description,
     });
   });
 
